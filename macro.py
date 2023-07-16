@@ -1,4 +1,5 @@
-﻿import os
+﻿#import os
+import sys
 import math
 # import openpyxl
 # import shutil
@@ -6,10 +7,10 @@ import getpass
 import time
 import pandas as pd
 import datetime
-import selenium
+#import selenium
 import urllib
-import requests
-import webbrowser
+#import requests
+#import webbrowser
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -36,8 +37,14 @@ data_atual = datetime.datetime.now()
 logging.basicConfig(level=logging.CRITICAL)
 ########### CLASS #########
 class Usuarios:
-    def __init__(self, nome, numero, arquivo, texto):
+    def __init__(self, nome, numero, arquivo, texto, texto2):
         # instancia do Nome
+        self.__texto = []
+        try:
+            numero_tratado = self.remover_formatacao_telefone(str(numero))
+        except:
+            pass
+
         try:
             if math.isnan(nome):
                 self.__nome = None
@@ -47,10 +54,10 @@ class Usuarios:
             self.__nome = nome
         # instancia do Numero
         try:
-            if math.isnan(numero):
+            if math.isnan(numero_tratado):
                 self.__numero = None
             else:
-                self.__numero = int(numero)
+                self.__numero = int(numero_tratado)
         except:
             self.__numero = 9999999999999
         # instancia do Arquivo
@@ -64,61 +71,83 @@ class Usuarios:
         # instancia do Texto
         try:
             if math.isnan(texto):
-                self.__texto = None
+                self.__texto.append(None)
             else:
-                self.__texto = str(texto)
+                self.__texto.append(str(texto))
         except:
-            self.__texto = str(texto)
-    
+            self.__texto.append(str(texto))
+        try:
+            if math.isnan(texto2):
+                self.__texto.append(None)
+            else:
+                self.__texto.append(str(texto2))
+        except:
+            self.__texto.append(str(texto2))
+
+    def remover_formatacao_telefone(self, telefone):
+        telefone = telefone.replace("(", "").replace(")", "").replace(" ", "")
+        return int(telefone)
+
     def enviar(self, navegador):
                 # verifica se o numero e o texto estão vazios se estiverem vazios ele encerra a função forçando a proxima execução e tbm informar no final do programa o motivo do error
-        if (self.__numero == None) or (self.__texto == None):
+        if (self.__numero == None):
             if self.__nome != None:
                 result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque o numero ou o texto são invalidos \n"
                 errors.append(result)
             return True
         # print(self.__nome)
         # formata o texto para acessar o link
-        texto = self.__texto.encode('utf-8')
-        texto = urllib.parse.quote(texto)
-        link = f"https://web.whatsapp.com/send?phone=55{self.__numero}&text={texto}"
-        # print(link)
-        time.sleep(1)
-        navegador.get(link)
-        time.sleep(1)
-        cont = 0
-        while True:
-        # print("veri 2")
-            cont += 1
-            try:
-                # print("veri 3")
-                # tentar encontrar o botão Enviar
-                enviar = navegador.find_element(By.XPATH, "//button[@data-testid='compose-btn-send']")
-                break
-            except:
+        self.__anexo_verifi = False
+        for texto_base in self.__texto:
+            if (texto_base == None) or texto_base == "nan":
+                continue
+            texto = texto_base.encode('utf-8')
+            texto = urllib.parse.quote(texto)
+            link = f"https://web.whatsapp.com/send?phone=55{self.__numero}&text={texto}"
+            # print(link)
+            time.sleep(1)
+            navegador.get(link)
+            time.sleep(1)
+            cont = 0
+            while True:
+            # print("veri 2")
+                cont += 1
                 try:
-                    # print("veri 4")
-                    # caso não ache o botão enviar tenta achar o botão continuar
-                    enviar = navegador.find_element(By.XPATH, '//*[@id="app"]/div/span[2]/div/span/div/div/div/div/div/div[2]/div/button/div/div')
-                    enviar.click()
-                    cont = 999
+                    # print("veri 3")
+                    # tentar encontrar o botão Enviar
+                    enviar = navegador.find_element(By.XPATH, "//button[@data-testid='compose-btn-send']")
                     break
                 except:
-                    # print("veri 5")
-                    #caso demore muito para achar um dos botões encerra a procura
-                    time.sleep(2)
-                    if cont >= 25:
+                    try:
+                        # print("veri 4")
+                        # caso não ache o botão enviar tenta achar o botão continuar
+                        enviar = navegador.find_element(By.XPATH, '//*[@id="app"]/div/span[2]/div/span/div/div/div/div/div/div[2]/div/button/div/div')
+                        enviar.click()
+                        cont = 999
                         break
-        if cont == 999:
-            result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque o numero informado é invalido \n"
-            errors.append(result)
-            return False
-        elif cont >= 25:
-            result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque aconteceu algum error ao enviar \n"
-            errors.append(result)
-            return False
-        #clicar no botão encontrado
-        enviar.click()
+                    except:
+                        # print("veri 5")
+                        #caso demore muito para achar um dos botões encerra a procura
+                        time.sleep(2)
+                        if cont >= 25:
+                            break
+            if cont == 999:
+                result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque o numero informado é invalido \n"
+                errors.append(result)
+                return False
+            elif cont >= 25:
+                result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque aconteceu algum error ao enviar \n"
+                errors.append(result)
+                return False
+            #clicar no botão encontrado
+            enviar.click()
+            time.sleep(1)
+            if self.__anexo_verifi == False:
+                self.anexo(navegador)
+            time.sleep(1)
+        # input()
+        return False
+    def anexo(self, navegador):
         if self.__arquivo != None:
         # Anexo de Arquivo
             time.sleep(1)
@@ -149,9 +178,8 @@ class Usuarios:
             except:
                 result = "Não foi possivel enviar o anexo para ''" + str(self.__nome) + "'' porque o arquivo não foi encontrado \n"
                 errors.append(result)
-                return
-        # input()
-        return False
+                return "voltou"
+        self.__anexo_verifi = True
 ##########################
 #função do pop up
 def popup_completed(mensagem, e=" "):
@@ -162,14 +190,14 @@ def popup_completed(mensagem, e=" "):
 # Lê a planilha usando o pandas
 planilha_excel = procurar_arquivo()
 try:
-    df = pd.read_excel(planilha_excel, sheet_name='WhatsApp', usecols='A:D', skiprows=7)
+    df = pd.read_excel(planilha_excel, sheet_name='WhatsApp', usecols='A:D,F', skiprows=7)
 except FileNotFoundError:
     mens = "Arquivo ''" + planilha_excel + "'' não encontrado"
     popup_completed(mens,"Error")
-    exit()
+    sys.exit()
 except:
     popup_completed("Feche a Planilha antes de executar o Script","Error")
-    exit() 
+    sys.exit() 
 # Remove as linhas com valores ausentes
 # df.dropna(inplace=True)
 # Armazena o conteúdo das colunas A, B, C e F em uma lista
@@ -177,7 +205,7 @@ lista_bruta = df.values.tolist()
 lista_tratada = []
 # cria uma lista para cada usaurio na Classe Usuario
 for users in lista_bruta:
-    lista_tratada.append(Usuarios(users[0],users[1],users[2],users[3]))
+    lista_tratada.append(Usuarios(users[0],users[1],users[2],users[3],users[4]))
 lista_bruta = None
 
 # acessar o navegador do usuario pelo perfil
@@ -206,3 +234,4 @@ if errors_final != "":
     popup_completed("o script foi concluido porem com alguns erros, os dados foram salvo no arquivo ''erros.txt''", "Script Concluido")
 else:
     popup_completed("Script Concluido sem erros!","Script Concluido")
+sys.exit()
