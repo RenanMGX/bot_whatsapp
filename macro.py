@@ -1,4 +1,4 @@
-import os
+﻿import os
 import math
 # import openpyxl
 # import shutil
@@ -14,10 +14,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+import logging
+
 # import win32com.client as win32
 # import psutil
 import tkinter as tk
 from tkinter import messagebox
+#desativar log do selenium
+logging.basicConfig(level=logging.CRITICAL)
 ########### CLASS #########
 class Usuarios:
     def __init__(self, nome, numero, arquivo, texto):
@@ -55,10 +59,10 @@ class Usuarios:
             self.__texto = str(texto)
     
     def enviar(self, navegador):
-        # verifica se o numero e o texto estão vazios se estiverem vazios ele encerra a função forçando a proxima execução e tbm informar no final do programa o motivo do error
+                # verifica se o numero e o texto estão vazios se estiverem vazios ele encerra a função forçando a proxima execução e tbm informar no final do programa o motivo do error
         if (self.__numero == None) or (self.__texto == None):
             if self.__nome != None:
-                result = "\n A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque o numero ou o texto são invalidos \n"
+                result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque o numero ou o texto são invalidos \n"
                 errors.append(result)
             return True
         # print(self.__nome)
@@ -70,12 +74,6 @@ class Usuarios:
         time.sleep(1)
         navegador.get(link)
         time.sleep(1)
-        try:
-            alert = navegador.switch_to.alert
-            alert.accept()
-            # print("aceitou")
-        except:
-            pass
         cont = 0
         while True:
         # print("veri 2")
@@ -96,11 +94,15 @@ class Usuarios:
                 except:
                     # print("veri 5")
                     #caso demore muito para achar um dos botões encerra a procura
-                    time.sleep(3)
+                    time.sleep(2)
                     if cont >= 25:
                         break
-        if cont >= 25:
-            result = "\nA mensagem não foi enviada para ''" + str(self.__nome) + "'' porque aconteceu algum error ao enviar \n"
+        if cont == 999:
+            result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque o numero informado é invalido \n"
+            errors.append(result)
+            return False
+        elif cont >= 25:
+            result = "A mensagem não foi enviada para ''" + str(self.__nome) + "'' porque aconteceu algum error ao enviar \n"
             errors.append(result)
             return False
         #clicar no botão encontrado
@@ -122,11 +124,21 @@ class Usuarios:
                 send = navegador.find_element(By.XPATH,"/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div")
                 # Clica no botão enviar
                 send.click()
+                confirmou = False
+                while True:
+                    if confirmou == True:
+                        break
+                    else:
+                        try:
+                            navegador.find_element(By.XPATH, '//span[@data-testid="msg-time"]')
+                            confirmou = False
+                        except:
+                            confirmou = True
             except:
-                result = "\nNão foi possivel enviar o anexo para ''" + str(self.__nome) + "'' porque o arquivo não foi encontrado \n"
+                result = "Não foi possivel enviar o anexo para ''" + str(self.__nome) + "'' porque o arquivo não foi encontrado \n"
                 errors.append(result)
                 return
-                time.sleep(10)  
+        # input()
         return False
 ##########################
 #função do pop up
@@ -151,6 +163,7 @@ except:
 # Armazena o conteúdo das colunas A, B, C e F em uma lista
 lista_bruta = df.values.tolist()
 lista_tratada = []
+# cria uma lista para cada usaurio na Classe Usuario
 for users in lista_bruta:
     lista_tratada.append(Usuarios(users[0],users[1],users[2],users[3]))
 lista_bruta = None
@@ -166,20 +179,20 @@ with webdriver.Chrome(options=options)as navegador:
     # a condicional conta quantas linhas da coluna nome estão vazias em sequencia se 5 ou mais estiverem vazias finaliza o loop
     for dados in lista_tratada:
         condicional = dados.enviar(navegador)
-        # print(finalizador)
         if condicional == True:
             finalizador += 1
         else:
             finalizador = 0
         if finalizador >= 5:
-            # print("Finalizado")
             break
         time.sleep(2)
 # final do programa ele conta erros que ocorreram durante a execução e coloca no popup no final do programa
 errors_final = ""
 for x in errors:
     errors_final = errors_final + x
+with open("erros.txt","w") as nao_enviados:
+    nao_enviados.write(errors_final)
 if errors_final != "":
-    popup_completed("Os seguintes erros aconteceram: \n" + errors_final, "Script Concluido")
+    popup_completed("o script foi concluido porem com alguns erros, os dados foram salvo no arquivo ''erros.txt''", "Script Concluido")
 else:
     popup_completed("Script Concluido sem erros!","Script Concluido")
