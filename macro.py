@@ -5,6 +5,7 @@ import math
 import getpass
 import time
 import pandas as pd
+import datetime
 import selenium
 import urllib
 import requests
@@ -15,11 +16,22 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import logging
+from tkinter import filedialog
+import tkinter as tk
+from tkinter import messagebox
+
 
 # import win32com.client as win32
 # import psutil
-import tkinter as tk
-from tkinter import messagebox
+#função para procurar a planilha
+def procurar_arquivo():
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askopenfilename()
+    return file_path
+
+data_atual = datetime.datetime.now()
+
 #desativar log do selenium
 logging.basicConfig(level=logging.CRITICAL)
 ########### CLASS #########
@@ -87,7 +99,7 @@ class Usuarios:
                 try:
                     # print("veri 4")
                     # caso não ache o botão enviar tenta achar o botão continuar
-                    enviar = navegador.find_element(By.XPATH, "/html/body/div[1]/div/span[2]/div/span/div/div/div/div/div/div[2]/div/div")
+                    enviar = navegador.find_element(By.XPATH, '//*[@id="app"]/div/span[2]/div/span/div/div/div/div/div/div[2]/div/button/div/div')
                     enviar.click()
                     cont = 999
                     break
@@ -121,7 +133,7 @@ class Usuarios:
                 attach.send_keys(self.__arquivo)
                 time.sleep(1)
                 # Seleciona botão enviar
-                send = navegador.find_element(By.XPATH,"/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div")
+                send = navegador.find_element(By.XPATH, '//*[@id="app"]/div/div/div[3]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div/span')
                 # Clica no botão enviar
                 send.click()
                 confirmou = False
@@ -148,7 +160,7 @@ def popup_completed(mensagem, e=" "):
         messagebox.showinfo(e, mensagem)
 
 # Lê a planilha usando o pandas
-planilha_excel = "Envio WhatsApp V.2.xlsm"
+planilha_excel = procurar_arquivo()
 try:
     df = pd.read_excel(planilha_excel, sheet_name='WhatsApp', usecols='A:D', skiprows=7)
 except FileNotFoundError:
@@ -190,8 +202,6 @@ with webdriver.Chrome(options=options)as navegador:
 errors_final = ""
 for x in errors:
     errors_final = errors_final + x
-with open("erros.txt","w") as nao_enviados:
-    nao_enviados.write(errors_final)
 if errors_final != "":
     popup_completed("o script foi concluido porem com alguns erros, os dados foram salvo no arquivo ''erros.txt''", "Script Concluido")
 else:
