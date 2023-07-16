@@ -42,23 +42,24 @@ except:
     from selenium.webdriver.common.by import By
     from selenium.webdriver.common.keys import Keys
 
-excel = win32.gencache.EnsureDispatch('Excel.Application')
-for wb in excel.Workbooks:
-    if wb.Name == "dados.xlsm":
-        wb.Close(SaveChanges=True)
-        break
-excel.Quit()
-time.sleep(3)
+# excel = win32.gencache.EnsureDispatch('Excel.Application')
+# for wb in excel.Workbooks:
+    # if wb.Name == "dados.xlsm":
+        # wb.Close(SaveChanges=True)
+        # break
+# excel.Quit()
+# time.sleep(3)
 # carregando a planilha "Macro.xlsm"
 try:
     wb = openpyxl.load_workbook("dados.xlsm", data_only=True)
     ws = wb.active
 except Exception as e:
     print(e)
-    input() 
+    input()
+    exit() 
 # criando a lista única com as informações das colunas "A", "C", "E" e "F" para cada linha
-lista_unica = [(ws.cell(row=row, column=1).value, ws.cell(row=row, column=3).value,
-                ws.cell(row=row, column=5).value, ws.cell(row=row, column=6).value)
+lista_unica = [(ws.cell(row=row, column=1).value, ws.cell(row=row, column=2).value,
+                ws.cell(row=row, column=3).value, ws.cell(row=row, column=4).value)
                for row in range(2, ws.max_row + 1)]
 username = getpass.getuser()
 options = webdriver.ChromeOptions()
@@ -72,12 +73,10 @@ navegador = webdriver.Chrome(options=options)
 for dados in lista_unica:
     # já estamos com o login feito no whatsapp web
     numero = dados[1]
-    if (dados[1] == None) or (dados[2] == None):
+    if (dados[1] == None) or (dados[3] == None):
         continue
-    if len(numero) != 13:
-        continue
-    texto = urllib.parse.quote(dados[2])
-    link = f"https://web.whatsapp.com/send?phone={numero}&text={texto}"
+    texto = urllib.parse.quote(dados[3])
+    link = f"https://web.whatsapp.com/send?phone=55{numero}&text={texto}"
     time.sleep(1)
     navegador.get(link)
     time.sleep(1)
@@ -109,7 +108,7 @@ for dados in lista_unica:
         continue
     # print("veri 6")
     enviar.click()
-    if dados[3] != None:
+    if dados[2] != None:
         time.sleep(1)
         try:
             # Clica no botão adicionar
@@ -119,7 +118,7 @@ for dados in lista_unica:
             time.sleep(1)
             attach = navegador.find_element(By.CSS_SELECTOR, "input[type='file']")
             # Adiciona arquivo
-            attach.send_keys(dados[3])
+            attach.send_keys(dados[2])
             time.sleep(1)
             # Seleciona botão enviar
             send = navegador.find_element(By.XPATH,"/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div")
