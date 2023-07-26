@@ -130,18 +130,6 @@ class Interface(QDialog,QMainWindow):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     gallery = Interface()
