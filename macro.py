@@ -64,7 +64,7 @@ class Interface(QDialog,QMainWindow):
         #botão iniciar o bot
         self.__bt_iniciar_bot = QPushButton("Começar Envio")
         self.__bt_iniciar_bot.setDefault(True)
-        self.__bt_iniciar_bot.clicked.connect(self.test)
+        self.__bt_iniciar_bot.clicked.connect(self.enviar)
         self.__bt_iniciar_bot.setFixedSize(bt_with,bt_height)
         self.__bt_iniciar_bot.setVisible(False)
 
@@ -157,6 +157,12 @@ class Interface(QDialog,QMainWindow):
         return df
     
     def enviar(self):
+        if self.is_browser_open() == False:
+            self.infor(reset=True)
+            self.infor("O navegador foi fechado tente novamente", title="Error:")
+            self.__bt_iniciar_bot.setVisible(False)
+            self.__bt_iniciar.setVisible(True)
+            return
         if self.__contador_exec == False:
             self.__contador_exec = True
             print("foi")
