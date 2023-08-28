@@ -208,7 +208,7 @@ class Interface(QDialog,QMainWindow):
             achou_numero = False
             while True:
                 try:
-                    enviar = self.__navegador.find_element(By.XPATH, "//button[@data-testid='compose-btn-send']")
+                    enviar = self.__navegador.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button/span')
                     achou_numero = True
                     break
                 except:
