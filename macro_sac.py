@@ -32,7 +32,7 @@ class Interface(QDialog,QMainWindow):
  
         disableWidgetsCheckBox = QCheckBox("&Disable widgets")
         
-        self.setWindowTitle("Bot Whatsapp")
+        self.setWindowTitle("Bot Whatsapp Relacionamento com o Cliente")
         
         self.createTopRightGroupBox()
 
@@ -45,7 +45,7 @@ class Interface(QDialog,QMainWindow):
     def createTopRightGroupBox(self):
         self.topRightGroupBox = QGroupBox("")
 
-        bt_with = 150
+        bt_with = 300
         bt_height = 50
         
         #botão iniciar
@@ -149,7 +149,7 @@ class Interface(QDialog,QMainWindow):
 
 
     def excel_load(self,planilha):
-        colunas = "A,B,C,D"
+        colunas = "A,B,C,D,F"
         quantidade_colunas = len(colunas.replace(",",""))
         df = pd.read_excel(planilha, sheet_name='WhatsApp', usecols=colunas, skiprows=7).values.tolist()
         for x in df:
@@ -302,6 +302,23 @@ class Interface(QDialog,QMainWindow):
                             self.__navegador.find_element(By.XPATH, '//span[@data-testid="msg-time"]')
                         except:
                             confirmou = True
+            print("##")
+            print(dados["Mensagem2"] != None)
+            print("##")
+            if dados["Mensagem2"] != None:
+                controle_mensagem2 = True
+                while controle_mensagem2:
+                    try:
+                        texto = self.__navegador.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p')
+                        texto.send_keys(dados["Mensagem2"])
+                        enviar = self.__navegador.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button/span')
+                        enviar.click()
+                        controle_mensagem2 = False
+                    except Exception as error:
+                        print(error)
+                        sleep(1)
+
+
                 
                 #etapa final
                 dados["Status"] = "Enviado: mensagem e anexo"
@@ -327,7 +344,7 @@ class Interface(QDialog,QMainWindow):
             dados_temp["Numero"] = dados_brutos[2]
             dados_temp["Arquivo"] = dados_brutos[3]
             dados_temp["Mensagem"] = dados_brutos[4]
-
+            dados_temp["Mensagem2"] = dados_brutos[5]
             #Tratar Nome
             try:
                 if math.isnan(dados_temp["Nome"]):
@@ -338,13 +355,15 @@ class Interface(QDialog,QMainWindow):
                 dados_temp["Nome"] = str(dados_temp["Nome"])
     
             #Tratar numero
+            
             try:
                 if math.isnan(dados_temp["Numero"]):
                     dados_temp["Numero"] = None                    
                 else:
-                    dados_temp["Numero"] = str(dados_temp["Numero"])
+                    dados_temp["Numero"] = str(int(dados_temp["Numero"]))
                     dados_temp["Numero"] = dados_temp["Numero"].replace("(", "").replace(")", "").replace(" ", "")
                     dados_temp["Numero"] = int(dados_temp["Numero"])
+                    
             except:
                 dados_temp["Numero"] = 9999999999999999
 
@@ -365,6 +384,13 @@ class Interface(QDialog,QMainWindow):
                     dados_temp["Mensagem"] = str(dados_temp["Mensagem"])
             except:
                 dados_temp["Mensagem"] = str(dados_temp["Mensagem"])
+            try:
+                if math.isnan(dados_temp["Mensagem2"]):
+                    dados_temp["Mensagem2"] = None
+                else:
+                    dados_temp["Mensagem2"] = str(dados_temp["Mensagem2"])
+            except:
+                dados_temp["Mensagem2"] = str(dados_temp["Mensagem2"])
 
             self.__dados_prontos.append(dados_temp)
 
