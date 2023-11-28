@@ -165,7 +165,7 @@ class Interface(QDialog,QMainWindow):
             return
         if self.__contador_exec == False:
             self.__contador_exec = True
-            print("foi")
+            #print("foi")
         else:
             self.__contador_exec = False
             return 
