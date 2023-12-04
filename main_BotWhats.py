@@ -32,7 +32,7 @@ class Interface(QDialog,QMainWindow):
  
         disableWidgetsCheckBox = QCheckBox("&Disable widgets")
         
-        self.setWindowTitle("Bot Whatsapp")
+        self.setWindowTitle(f"{version} | Bot Whatsapp")
         
         self.createTopRightGroupBox()
 
@@ -171,11 +171,12 @@ class Interface(QDialog,QMainWindow):
             return 
         self.infor(reset=True)
         try:
-            self.__navegador.find_element(By.XPATH, '//*[@id="app"]/div/div/div[3]/div[1]/div/div/div[2]/div')
-            self.infor(reset=True)
-            self.infor("conecte-se ao whatsapp web antes de prosseguir", title="Error")
-            self.__contador_exec = False
-            return
+            texto_verific = self.__navegador.find_element(By.XPATH, '//*[@id="app"]/div/div[2]/div[3]/div[1]/div/div/div[1]/div[1]')
+            if texto_verific.text == "Use o WhatsApp no seu computador":
+                self.infor(reset=True)
+                self.infor("conecte-se ao whatsapp web antes de prosseguir", title="Error")
+                self.__contador_exec = False
+                return
         except:
             pass
 
@@ -202,7 +203,7 @@ class Interface(QDialog,QMainWindow):
                 dados["Nome"] = "SEM NOME"
             dados["Mensagem"] = dados["Mensagem"].encode('utf-8')
             dados["Mensagem"] = urllib.parse.quote(dados["Mensagem"])
-            link = f'https://web.whatsapp.com/send?phone=55{dados["Numero"]}&text={dados["Mensagem"]}'
+            link = f'https://web.whatsapp.com/send?phone=55{int(dados["Numero"])}&text={dados["Mensagem"]}'
             self.__navegador.get(link)
             contator_finalizar = 0
             achou_numero = False
@@ -343,7 +344,7 @@ class Interface(QDialog,QMainWindow):
                     dados_temp["Numero"] = None                    
                 else:
                     dados_temp["Numero"] = str(dados_temp["Numero"])
-                    dados_temp["Numero"] = dados_temp["Numero"].replace("(", "").replace(")", "").replace(" ", "")
+                    dados_temp["Numero"] = dados_temp["Numero"].replace("(", "").replace(")", "").replace(" ", "").replace(".0", "")
                     dados_temp["Numero"] = int(dados_temp["Numero"])
             except:
                 dados_temp["Numero"] = 9999999999999999
@@ -411,13 +412,8 @@ class Interface(QDialog,QMainWindow):
         return os.path.isfile(file_path) and file_path.lower().endswith(('.xls', '.xlsx', '.xlsm', '.xlsb'))
 
 
-
-
-
-
-
-
 if __name__ == "__main__":
+    version = "v2.1"
     app = QApplication(sys.argv)
     gallery = Interface()
     gallery.show()
