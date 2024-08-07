@@ -4,7 +4,7 @@ import sys
 import getpass
 import pandas as pd
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait # type: ignore
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -194,7 +194,7 @@ class Interface(QDialog,QMainWindow):
         vesualiza_final = []
         for dados in self.__dados_prontos:
             if dados["Numero"] == None:
-                dados["Status"] == "Error: numero não encontrado"
+                dados["Status"] == "Error: numero não encontrado"  #type: ignore
                 continue
             if (dados["Mensagem"] == None) or (dados["Mensagem"] == "nan"):
                 dados["Status"] = "Error: mensagem não encontrada!"
@@ -202,7 +202,7 @@ class Interface(QDialog,QMainWindow):
             if (dados["Nome"] == None) or (dados["Nome"] == "nan"):
                 dados["Nome"] = "SEM NOME"
             dados["Mensagem"] = dados["Mensagem"].encode('utf-8')
-            dados["Mensagem"] = urllib.parse.quote(dados["Mensagem"])
+            dados["Mensagem"] = urllib.parse.quote(dados["Mensagem"]) #type: ignore
             link = f'https://web.whatsapp.com/send?phone=55{int(dados["Numero"])}&text={dados["Mensagem"]}'
             self.__navegador.get(link)
             contator_finalizar = 0
@@ -226,7 +226,7 @@ class Interface(QDialog,QMainWindow):
                     contator_finalizar +=1
                     sleep(1)
             if enviar == False:
-                dados["Status"] == "Error: não conseguiu clicar"
+                dados["Status"] == "Error: não conseguiu clicar" #type: ignore
                 continue
             else:
                 if achou_numero:
@@ -238,6 +238,7 @@ class Interface(QDialog,QMainWindow):
                     continue
             
             if (dados["Arquivo"] != None) and (os.path.isfile(dados["Arquivo"])):
+                #import pdb; pdb.set_trace()
                 sleep(1)
                 # etapa 1
                 contator_finalizar = 0
@@ -279,8 +280,15 @@ class Interface(QDialog,QMainWindow):
                 contator_finalizar = 0
                 while True:
                     try:
-                        send = self.__navegador.find_element(By.XPATH, '//*[@id="app"]/div/div/div[3]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div/span')
-                        break
+                        #send = self.__navegador.find_element(By.XPATH, '//*[@id="app"]/div/div/div[3]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div/span')
+                        span = ""
+                        html = self.__navegador.find_element(By.TAG_NAME, 'html')
+                        for span in html.find_elements(By.TAG_NAME, 'span'): 
+                            if (span.get_attribute('data-icon') == 'send') and (span.get_attribute('class') == 'xsgj6o6'):
+                                send = span
+                                break
+                        if span:
+                            break
                     except:
                         if contator_finalizar <= 5*60:
                             contator_finalizar += 1
