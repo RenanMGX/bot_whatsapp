@@ -238,7 +238,9 @@ class Interface(QDialog,QMainWindow):
                     continue
             
             if (dados["Arquivo"] != None) and (os.path.isfile(dados["Arquivo"])):
+                #nav = self.__navegador
                 #import pdb; pdb.set_trace()
+                
                 sleep(1)
                 # etapa 1
                 contator_finalizar = 0
@@ -259,10 +261,19 @@ class Interface(QDialog,QMainWindow):
                     arquivo.click()
 
                 #etapa 2
+                
                 contator_finalizar = 0
                 while True:
                     try:
-                        attach = self.__navegador.find_element(By.CSS_SELECTOR, "input[type='file']")
+                        arqu = str(dados["Arquivo"]).lower()
+                        if (arqu.endswith('.jpg')) or (arqu.endswith('.gif')) or (arqu.endswith('.png')) or (arqu.endswith('.svg')) or (arqu.endswith('.psd')):
+                            html = self.__navegador.find_element(By.TAG_NAME, 'html')
+                            for input in html.find_elements(By.TAG_NAME, 'input'):
+                                if input.get_attribute('accept') == 'image/*,video/mp4,video/3gpp,video/quicktime':
+                                    attach = input
+                        else:
+                            attach = self.__navegador.find_element(By.CSS_SELECTOR, "input[type='file']")
+                        #attach.get_attribute('accept') == 'image/*,video/mp4,video/3gpp,video/quicktime'
                         break
                     except:
                         if contator_finalizar <= 5*60:
