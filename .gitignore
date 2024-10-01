@@ -2,6 +2,8 @@
 *dist
 *.spec
 *.vscode
+*#material
+*teste_execute.py
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,venv
