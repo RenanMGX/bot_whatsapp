@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common import exceptions
 from selenium.webdriver.remote.webelement import WebElement
-import exceptions as ModelExecptions
+from . import exceptions as ModelExecptions
 from time import sleep
 from getpass import getuser
 import os
@@ -19,7 +19,7 @@ class Nav(Chrome):
     def find_element(self, by=By.ID, value: str | None = None) -> WebElement:
         try:
             while super().find_element(By.ID, 'app').text == 'WhatsApp\n Protegida com a criptografia de ponta a ponta':
-                sleep(1)
+                sleep(.1)
         except:
             pass
         element = super().find_element(by, value)
@@ -64,13 +64,13 @@ class Navegador():
             try:
                 self.nav.find_element(By.ID, 'link-device-phone-number-code-screen-instructions')
                 print("ainda não fez login")
-                sleep(1)
+                sleep(.1)
             except exceptions.NoSuchElementException:
                 if not esperar_conectar:
                     return False
                 try:
                     self.nav.find_element(By.ID, 'side')
-                    sleep(1)
+                    sleep(.1)
                     if len(janelas:=self.nav.window_handles):
                         for janela in janelas:
                             if janela == janelas[0]:
@@ -82,31 +82,37 @@ class Navegador():
                     return True
                 except exceptions.NoSuchElementException:
                     print("conectando")
-                sleep(1)
+                sleep(.1)
     
     
     def enviar_mensagem(self, *, numero:str, mensagem:str, arquivo:str=""):
         for _ in range(3):
             url = f'{self.url}send?phone={numero}'
-            print(url)
+            #print(url)
             self.nav.get(url)
             
-            self.__verificar_numero()
+            try:
+                self.__verificar_numero()
+            except Exception as err:
+                print(type(err), err)
+                continue
             
-            if arquivo:
-                self.__anexar_arquivo(arquivo)
+            while self.nav.find_element(By.ID, 'app').text.startswith('Iniciando conversa'):
+                sleep(.1)
             
             xpath_area_texto = '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p'
             while len(self.nav.find_element(By.XPATH, xpath_area_texto).text) > 0:
                 self.nav.find_element(By.XPATH, xpath_area_texto).send_keys(Keys.BACKSPACE)
             self.nav.find_element(By.XPATH, xpath_area_texto).send_keys(mensagem)
             
-
-            
             xpath_enviar:str = '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[2]/button/span'
             if self.nav.find_element(By.XPATH, xpath_enviar).get_attribute('data-icon') == 'send':
                 self.nav.find_element(By.XPATH, xpath_enviar).click()
-                return True
+            
+            if arquivo:
+                self.__anexar_arquivo(arquivo)
+                
+            return True
     
     def __anexar_arquivo(self, arquivo:str) -> None:
         if not os.path.exists(arquivo):
@@ -145,5 +151,9 @@ class Navegador():
         print("numero liberado sem problemas")
         
 if __name__ == "__main__":
-    pass    
+    bot = Navegador()  
+    bot.iniciar_navegador(f"https://web.whatsapp.com/")  
+    
+    import pdb;pdb.set_trace()
+    bot.enviar_mensagem(numero='5531994773182', mensagem="teste1")
     

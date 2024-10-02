@@ -51,6 +51,11 @@ class View(QMainWindow):
         self.tela2_lista.setGeometry(QtCore.QRect(140, 10, 256, 192))
         self.tela2_lista.setObjectName("tela2_lista")
         
+        self.tela2_label = QtWidgets.QLabel(self.tela2_dados)
+        self.tela2_label.setGeometry(QtCore.QRect(10, 120, 111, 80))
+        #self.tela2_label.setStyleSheet("border: 2px solid black")
+        self.tela2_label.setWordWrap(True)
+        
         self.Telas.addWidget(self.tela2_dados)
 
         self.retranslateUi()
@@ -93,8 +98,7 @@ class View(QMainWindow):
         
         self.tela2_lista.addItem(item)
         
-        
-
+    
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
@@ -106,3 +110,4 @@ if __name__ == "__main__":
     view.adicionar_item(text='text', type='Unchecked')
     view.show()
     sys.exit(app.exec_())
+    

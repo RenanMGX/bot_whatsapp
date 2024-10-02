@@ -21,7 +21,10 @@ class Dados:
         if not file_path.endswith(".xlsx"):
             raise TypeError("apenas arquivos excel que terminam com .xlsx")
         
-        
+        try:
+            del self.__df
+        except:
+            pass
         self.__df:pd.DataFrame = pd.read_excel(file_path, dtype=str, skiprows=skiprows)
         
         self.__file_path:str = file_path

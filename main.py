@@ -1,7 +1,7 @@
+import sys
 from PyQt5.QtWidgets import QApplication
 from model.model import Model
 from view.view import View
-import sys
 
 
 class Controller:
@@ -24,19 +24,30 @@ class Controller:
         if not self.model.navegador.verificar_tela_inicio(esperar_conectar=False):
             print("é preciso está conectado")
         self.model.carregar_dados()
+        self.view.tela2_lista.clear()
         for values in self.model.dados:
             self.view.adicionar_item(text=f'{values['Nome']} | {values['Numero']}', type='Unchecked')
         if self.model.dados:
             self.view.tela2_bt_enviar.setEnabled(True)
             
     def enviar(self):
-        if not self.model.navegador.verificar_tela_inicio(esperar_conectar=False):
-            print("é preciso está conectado")
-        for values in self.model.dados:
-            try:
-                self.model.navegador.enviar_mensagem(numero=values['Numero'], mensagem=values['Mensagem'], arquivo=values['Anexo'])
-            except Exception as err:
-                print(err)
+        self.view.tela2_label.setText("")
+        self.view.hide()
+        try:
+            if not self.model.navegador.verificar_tela_inicio(esperar_conectar=False):
+                print("é preciso está conectado")
+            for values in self.model.dados:
+                try:
+                    self.model.navegador.enviar_mensagem(numero=values['Numero'], mensagem=values['Mensagem'], arquivo=values['Anexo'])
+                except Exception as err:
+                    print(err)
+            self.view.tela2_label.setText("Finalizado!")
+        except Exception as err:
+            self.view.tela2_label.setText(str(err))
+        finally:
+            self.view.show()
+            
+
             
         
         
