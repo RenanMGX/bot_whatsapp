@@ -12,11 +12,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from typing import Literal
 from PyQt5.QtCore import Qt
-
+from model.Entities.navegador import Navegador
 
 class View(QMainWindow):
     
-    def __init__(self, version:str='Beta'):
+    def __init__(self, *, nav:Navegador|None=None, version:str='Beta'):
+        self.__nav:Navegador|None = nav
         self.__version = version
         super().__init__()
         self.setObjectName("BotWhatsApp")
@@ -97,7 +98,20 @@ class View(QMainWindow):
         item.setText(text)
         
         self.tela2_lista.addItem(item)
-        
+
+    def closeEvent(self, event):
+        if self.__nav:
+            print("fechou")
+            try:
+                self.__nav.nav.close()
+            except:
+                pass
+            try:
+                del self.__nav
+            except:
+                pass
+            
+        event.accept()
     
 
 if __name__ == "__main__":

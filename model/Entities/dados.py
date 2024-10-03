@@ -15,17 +15,18 @@ class Dados:
     def file_path(self) -> str:
         return self.__file_path
         
-    def __init__(self, file_path:str, *, skiprows:int=7) -> None:
+    def __init__(self, file_path:str, *, skiprows:int=7, sheet:str="WhatsApp") -> None:
         if not os.path.exists(file_path):
             raise FileExistsError("Arquivo não encontrado!")
-        if not file_path.endswith(".xlsx"):
+        if (not file_path.endswith(".xlsx")) and ((not file_path.endswith(".xlsm"))) and ((not file_path.endswith(".xls"))) :
             raise TypeError("apenas arquivos excel que terminam com .xlsx")
         
         try:
             del self.__df
         except:
             pass
-        self.__df:pd.DataFrame = pd.read_excel(file_path, dtype=str, skiprows=skiprows)
+        
+        self.__df:pd.DataFrame = pd.read_excel(file_path, dtype=str, skiprows=skiprows, sheet_name=sheet)        
         
         self.__file_path:str = file_path
         
@@ -34,19 +35,19 @@ class Dados:
         for row,value in self.df.iterrows():
             dict_infor = dict = {}
             
-            dict_infor['Mensagem'] = value['Mensagem']
+            dict_infor['Mensagem'] = str(value['Mensagem - Final'])
             
             
             if value['Anexo']:
                 anexo_temp = os.path.join(os.path.dirname(self.file_path), str(value['Anexo']))
                 if os.path.exists(anexo_temp):
-                    dict_infor['Anexo'] = anexo_temp
+                    dict_infor['Anexo'] = str(anexo_temp)
                 else:
-                    dict_infor['Anexo'] = value['Anexo']
+                    dict_infor['Anexo'] = str(value['Anexo'])
             else:
                 dict_infor['Anexo'] = ''
                 
-            dict_infor['Nome'] = value['Nome']
+            dict_infor['Nome'] = str(value['Nome'])
                 
             numero:str = str(value['Numero'])
             numero = numero.replace('(', '').replace(')', '').replace('-', '').replace(' ', '').replace('+', '')
@@ -69,6 +70,8 @@ class Dados:
             
         
 if __name__ == "__main__":
-    bot = Dados(r'R:\#Prontos\bot_whatsapp\#material\Numeros_Whats.xlsx')
+    bot = Dados(r'C:\Users\renan.oliveira\Downloads\## NÃO ENCONTRADOS ##\Envio WhatsApp V.2.xlsm', skiprows=8)
+    print(bot.df)
     print(bot.extrair_dados(nacionalidade='Brasil'))
+
     

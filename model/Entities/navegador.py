@@ -4,7 +4,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common import exceptions
 from selenium.webdriver.remote.webelement import WebElement
-from . import exceptions as ModelExecptions
+try:
+    from . import exceptions as ModelExecptions
+except:
+    pass
 from time import sleep
 from getpass import getuser
 import os
@@ -16,12 +19,13 @@ class Nav(Chrome):
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         super().__init__(options=options)
         
-    def find_element(self, by=By.ID, value: str | None = None) -> WebElement:
-        try:
-            while super().find_element(By.ID, 'app').text == 'WhatsApp\n Protegida com a criptografia de ponta a ponta':
-                sleep(.1)
-        except:
-            pass
+    def find_element(self, by=By.ID, value: str | None = None, verificar_tela_login:bool=True) -> WebElement:
+        if verificar_tela_login:
+            try:
+                while super().find_element(By.ID, 'app').text == 'WhatsApp\n Protegida com a criptografia de ponta a ponta':
+                    sleep(.1)
+            except:
+                pass
         element = super().find_element(by, value)
         
         return  element
@@ -67,7 +71,7 @@ class Navegador():
                 sleep(.1)
             except exceptions.NoSuchElementException:
                 if not esperar_conectar:
-                    return False
+                    return True
                 try:
                     self.nav.find_element(By.ID, 'side')
                     sleep(.1)
@@ -86,33 +90,49 @@ class Navegador():
     
     
     def enviar_mensagem(self, *, numero:str, mensagem:str, arquivo:str=""):
-        for _ in range(3):
+        try:
             url = f'{self.url}send?phone={numero}'
             #print(url)
             self.nav.get(url)
             
-            try:
-                self.__verificar_numero()
-            except Exception as err:
-                print(type(err), err)
-                continue
+            # try:
+            #     self.__verificar_numero()
+            # except Exception as err:
+            #     print(type(err), err)
+            #     continue
             
+            #sleep(2)
             while self.nav.find_element(By.ID, 'app').text.startswith('Iniciando conversa'):
+                print('Iniciando conversa')
                 sleep(.1)
             
-            xpath_area_texto = '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p'
-            while len(self.nav.find_element(By.XPATH, xpath_area_texto).text) > 0:
-                self.nav.find_element(By.XPATH, xpath_area_texto).send_keys(Keys.BACKSPACE)
-            self.nav.find_element(By.XPATH, xpath_area_texto).send_keys(mensagem)
+            _mensagem = mensagem.split('\n')
+                
+            xpath_area_texto = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p', verificar_tela_login=False)
+            if len(xpath_area_texto.text) > 0:
+                xpath_area_texto.send_keys(Keys.RETURN)
             
-            xpath_enviar:str = '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[2]/button/span'
-            if self.nav.find_element(By.XPATH, xpath_enviar).get_attribute('data-icon') == 'send':
-                self.nav.find_element(By.XPATH, xpath_enviar).click()
+            for msg in _mensagem:
+                #while self.nav.find_element(By.XPATH, xpath_enviar).get_attribute('data-icon') != 'send':
+                xpath_area_texto.send_keys(msg)
+                xpath_area_texto.send_keys(Keys.ALT + Keys.ENTER)
+                
+                    
+            xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[2]/button/span', verificar_tela_login=False)
+            if xpath_enviar.get_attribute('data-icon') == 'send':
+                xpath_enviar.click()
+                #sleep(.5)
             
             if arquivo:
-                self.__anexar_arquivo(arquivo)
-                
+                try:
+                    self.__anexar_arquivo(arquivo)
+                except Exception as err:
+                    print(type(err), str(err))
+            
+        
             return True
+        except Exception as err:
+            raise err
     
     def __anexar_arquivo(self, arquivo:str) -> None:
         if not os.path.exists(arquivo):
@@ -131,6 +151,7 @@ class Navegador():
 
 
     def __verificar_numero(self):
+        sleep(2)
         try:
             self.nav.find_element(By.ID , 'side')
             try:
