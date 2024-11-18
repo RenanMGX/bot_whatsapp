@@ -126,15 +126,18 @@ class Navegador():
             if arquivo:
                 try:
                     self.__anexar_arquivo(arquivo)
+                    print("Anexou")
                 except Exception as err:
                     print(type(err), str(err))
             
-        
+            sleep(1)
+            
             return True
         except Exception as err:
             raise err
     
     def __anexar_arquivo(self, arquivo:str) -> None:
+        print("anexando arquivo")
         if not os.path.exists(arquivo):
             return
         if not os.path.isfile(arquivo):
@@ -147,8 +150,17 @@ class Navegador():
         else:
             self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div[2]/div/span/div/ul/div/div[1]/li/div/input').send_keys(arquivo)
         
-        self.nav.find_element(By.XPATH, '//*[@id="app"]/div/div[2]/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div/span').click()
-
+        #import pdb;pdb.set_trace()
+        
+        for num in range(15):
+            try:
+                self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[{num}]/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div/span').click()
+                return
+            except:
+                pass
+            if num >= 14:
+                raise Exception("Erro ao anexar arquivo")
+        
 
     def __verificar_numero(self):
         sleep(2)
@@ -175,6 +187,8 @@ if __name__ == "__main__":
     bot = Navegador()  
     bot.iniciar_navegador(f"https://web.whatsapp.com/")  
     
-    import pdb;pdb.set_trace()
-    bot.enviar_mensagem(numero='5531994773182', mensagem="teste1")
+    #import pdb;pdb.set_trace()
+    bot.enviar_mensagem(numero='5531994773182', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    bot.enviar_mensagem(numero='5531994773182', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    bot.enviar_mensagem(numero='5531994773182', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
     
