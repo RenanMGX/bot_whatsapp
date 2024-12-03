@@ -143,14 +143,14 @@ class Navegador():
         if not os.path.isfile(arquivo):
             return
         
-        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div[2]/div/div/div/span').click() #mais
-        
+        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
+       
         if (arquivo.endswith('.jpg')) or (arquivo.endswith('.gif')) or (arquivo.endswith('.png')) or (arquivo.endswith('.svg')) or (arquivo.endswith('.psd')):
-            self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div[2]/div/span/div/ul/div/div[2]/li/div/input').send_keys(arquivo)
+            self.nav.find_element(By.XPATH, '//*[@id="app"]/div/span[5]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
+                                            
         else:
-            self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div[2]/div/span/div/ul/div/div[1]/li/div/input').send_keys(arquivo)
+            self.nav.find_element(By.XPATH, '//*[@id="app"]/div/span[5]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
         
-        #import pdb;pdb.set_trace()
         
         for num in range(15):
             try:
@@ -187,8 +187,8 @@ if __name__ == "__main__":
     bot = Navegador()  
     bot.iniciar_navegador(f"https://web.whatsapp.com/")  
     
-    #import pdb;pdb.set_trace()
-    bot.enviar_mensagem(numero='5531994773182', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
-    bot.enviar_mensagem(numero='5531994773182', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
-    bot.enviar_mensagem(numero='5531994773182', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    import pdb;pdb.set_trace()
+    bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
     
