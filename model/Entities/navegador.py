@@ -107,7 +107,8 @@ class Navegador():
                 sleep(.1)
             
             _mensagem = mensagem.split('\n')
-                
+            #import pdb;pdb.set_trace() # <-------------------------------- Debug
+                        
             xpath_area_texto = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p', verificar_tela_login=False)
             if len(xpath_area_texto.text) > 0:
                 xpath_area_texto.send_keys(Keys.RETURN)
@@ -125,8 +126,8 @@ class Navegador():
             
             if arquivo:
                 try:
-                    self.__anexar_arquivo(arquivo)
-                    print("Anexou")
+                    if self.__anexar_arquivo(arquivo):
+                        print("Anexou")
                 except Exception as err:
                     print(type(err), str(err))
             
@@ -136,30 +137,42 @@ class Navegador():
         except Exception as err:
             raise err
     
-    def __anexar_arquivo(self, arquivo:str) -> None:
+    def __anexar_arquivo(self, arquivo:str) -> bool:
         print("anexando arquivo")
         if not os.path.exists(arquivo):
-            return
+            print("arquivo não existe")
+            return False
         if not os.path.isfile(arquivo):
-            return
+            print("não é um arquivo")
+            return False
         
         self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
        
         if (arquivo.endswith('.jpg')) or (arquivo.endswith('.gif')) or (arquivo.endswith('.png')) or (arquivo.endswith('.svg')) or (arquivo.endswith('.psd')):
             self.nav.find_element(By.XPATH, '//*[@id="app"]/div/span[5]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
                                             
-        else:
+        else:                               
             self.nav.find_element(By.XPATH, '//*[@id="app"]/div/span[5]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
         
         
-        for num in range(15):
+        for _ in range(15): 
             try:
-                self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[{num}]/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div/span').click()
-                return
+                self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[3]/div/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div').click()
+                return True
             except:
                 pass
-            if num >= 14:
-                raise Exception("Erro ao anexar arquivo")
+            sleep(1)
+            
+        # for num in range(15):
+        #     try:                                 
+        #         self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[{num}]/div/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div').click()
+        #         return
+        #     except:
+        #         pass
+        #     if num >= 14:
+        #         raise Exception("Erro ao anexar arquivo")
+        print("não foi possivel anexar o arquivo")
+        return False
         
 
     def __verificar_numero(self):
@@ -184,11 +197,15 @@ class Navegador():
         print("numero liberado sem problemas")
         
 if __name__ == "__main__":
+    from datetime import datetime
     bot = Navegador()  
     bot.iniciar_navegador(f"https://web.whatsapp.com/")  
     
-    import pdb;pdb.set_trace()
-    bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
-    bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
-    bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\Screenshot_1.png")
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
+
+    #import pdb;pdb.set_trace()
+    #bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
+    #bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
     
