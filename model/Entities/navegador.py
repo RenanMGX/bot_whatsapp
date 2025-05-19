@@ -147,21 +147,31 @@ class Navegador():
             return False
         
         self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
-       
-        if (arquivo.endswith('.jpg')) or (arquivo.endswith('.gif')) or (arquivo.endswith('.png')) or (arquivo.endswith('.svg')) or (arquivo.endswith('.psd')):
-            self.nav.find_element(By.XPATH, '//*[@id="app"]/div/span[5]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
-                                            
-        else:                               
-            self.nav.find_element(By.XPATH, '//*[@id="app"]/div/span[5]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
+        #import pdb;pdb.set_trace() # <-------------------------------- Debug
+
+        for num in range(1,15):
+            try:
+                if (arquivo.endswith('.jpg')) or (arquivo.endswith('.gif')) or (arquivo.endswith('.png')) or (arquivo.endswith('.svg')) or (arquivo.endswith('.psd')):
+                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/span[{num}]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
+                
+                else:                               
+                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/span[{num}]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
+                break
+            except:
+                pass
+                #sleep(1)
+            if num >= 14:
+                print("não foi possivel anexar o arquivo")
+                return False
         
-        
-        for _ in range(15): 
+        for _ in range(25): 
             try:
                 self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[3]/div/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div').click()
+                sleep(5)
                 return True
             except:
                 pass
-            sleep(1)
+            sleep(.25)
             
         # for num in range(15):
         #     try:                                 
