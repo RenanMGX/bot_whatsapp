@@ -107,20 +107,27 @@ class Navegador():
                 sleep(.1)
             
             _mensagem = mensagem.split('\n')
-            #import pdb;pdb.set_trace() # <-------------------------------- Debug
                         
             xpath_area_texto = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p', verificar_tela_login=False)
             if len(xpath_area_texto.text) > 0:
                 xpath_area_texto.send_keys(Keys.RETURN)
             
+            
             for msg in _mensagem:
                 #while self.nav.find_element(By.XPATH, xpath_enviar).get_attribute('data-icon') != 'send':
-                xpath_area_texto.send_keys(msg)
-                xpath_area_texto.send_keys(Keys.ALT + Keys.ENTER)
+                try:
+                    xpath_area_texto.send_keys(msg)
+                    xpath_area_texto.send_keys(Keys.ALT + Keys.ENTER)
+                except:
+                    pass
+                sleep(.5)
                 
                     
-            xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[2]/button/span', verificar_tela_login=False)
-            if xpath_enviar.get_attribute('data-icon') == 'send':
+            #import pdb;pdb.set_trace() # <-------------------------------- Debug
+                                                           
+            #xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[2]/button/span', verificar_tela_login=False)
+            xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[4]/button/span', verificar_tela_login=False)
+            if xpath_enviar.get_attribute('data-icon') == 'wds-ic-send-filled':
                 xpath_enviar.click()
                 #sleep(.5)
             
@@ -146,8 +153,11 @@ class Navegador():
             print("não é um arquivo")
             return False
         
-        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
+        
         #import pdb;pdb.set_trace() # <-------------------------------- Debug
+        #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
+                                        
+        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/button/span').click() #mais 
 
         for num in range(1,15):
             try:
@@ -211,10 +221,11 @@ if __name__ == "__main__":
     bot = Navegador()  
     bot.iniciar_navegador(f"https://web.whatsapp.com/")  
     
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
     bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\Screenshot_1.png")
     bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
-    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
 
+    print("Concluido")
     #import pdb;pdb.set_trace()
     #bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
     #bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
