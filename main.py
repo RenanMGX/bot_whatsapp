@@ -62,7 +62,10 @@ class Controller:
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     model = Model()
-    view = View(version="v3.1", nav=model.navegador)
+    ##################################################################################################
+    view = View(version="v3.2", nav=model.navegador) # <------------------ Lembrar de alterar a versão
+    ###################################################################################################
     controller = Controller(model=model, view=view)
     view.show()
     sys.exit(app.exec_())
+ 

@@ -107,7 +107,8 @@ class Navegador():
                 sleep(.1)
             
             _mensagem = mensagem.split('\n')
-                        
+            
+            sleep(1)
             xpath_area_texto = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p', verificar_tela_login=False)
             if len(xpath_area_texto.text) > 0:
                 xpath_area_texto.send_keys(Keys.RETURN)
@@ -126,10 +127,16 @@ class Navegador():
             #import pdb;pdb.set_trace() # <-------------------------------- Debug
                                                            
             #xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[2]/button/span', verificar_tela_login=False)
-            xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[4]/button/span', verificar_tela_login=False)
-            if xpath_enviar.get_attribute('data-icon') == 'wds-ic-send-filled':
-                xpath_enviar.click()
-                #sleep(.5)
+            #import pdb;pdb.set_trace() # <-------------------------------- Debug
+            sleep(1)
+
+            try:
+                xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[4]/div/span/div/div/div[1]/div[1]/span', verificar_tela_login=False)
+                if xpath_enviar.get_attribute('data-icon') == 'wds-ic-send-filled':
+                    xpath_enviar.click()
+                    #sleep(.5)
+            except Exception:
+                pass
             
             if arquivo:
                 try:
@@ -156,16 +163,17 @@ class Navegador():
         
         #import pdb;pdb.set_trace() # <-------------------------------- Debug
         #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
-                                        
-        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/button/span').click() #mais 
+                                        #''
+        #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/button/span').click() #mais 
+        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/div/span/div/div/div[1]/div[1]/span').click() #mais 
 
         for num in range(1,15):
             try:
                 if (arquivo.endswith('.jpg')) or (arquivo.endswith('.gif')) or (arquivo.endswith('.png')) or (arquivo.endswith('.svg')) or (arquivo.endswith('.psd')):
-                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/span[{num}]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
+                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div[1]/span[{num}]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
                 
                 else:                               
-                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/span[{num}]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
+                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div[1]/span[{num}]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
                 break
             except:
                 pass
