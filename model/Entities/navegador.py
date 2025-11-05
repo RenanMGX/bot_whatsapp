@@ -11,8 +11,15 @@ except:
 from time import sleep
 from getpass import getuser
 import os
+from typing import Literal
 
 class Nav(Chrome):
+    def __delete__(self):
+        try:
+            self.close()
+        except:
+            pass
+    
     def __init__(self) -> None:
         options = Options()
         options.add_argument(f"--user-data-dir=C:\\Users\\{getuser()}\\AppData\\Local\\Google\\Chrome")
@@ -102,6 +109,7 @@ class Navegador():
             #     continue
             
             #sleep(2)
+            
             while self.nav.find_element(By.ID, 'app').text.startswith('Iniciando conversa'):
                 print('Iniciando conversa')
                 sleep(.1)
@@ -109,7 +117,10 @@ class Navegador():
             _mensagem = mensagem.split('\n')
             
             sleep(1)
-            xpath_area_texto = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div[1]/div/div[1]/p', verificar_tela_login=False)
+            #import pdb;pdb.set_trace() # <-------------------------------- Debug
+            
+            xpath_area_texto = self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-placeholder", value_attribute="Digite uma mensagem", _element=self.nav.find_element(By.ID, 'main'))
+                                                               #'selectable-text copyable-text x15bjb6t x1n2onr6'
             if len(xpath_area_texto.text) > 0:
                 xpath_area_texto.send_keys(Keys.RETURN)
             
@@ -130,14 +141,12 @@ class Navegador():
             #import pdb;pdb.set_trace() # <-------------------------------- Debug
             sleep(1)
 
-            try:
-                xpath_enviar = self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[4]/div/span/div/div/div[1]/div[1]/span', verificar_tela_login=False)
-                if xpath_enviar.get_attribute('data-icon') == 'wds-ic-send-filled':
-                    xpath_enviar.click()
-                    #sleep(.5)
-            except Exception:
-                pass
             
+            self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Enviar", _element=self.nav.find_element(By.ID, 'main')).click()
+            sleep(1)
+            
+            
+                                                                                                                                                          
             if arquivo:
                 try:
                     if self.__anexar_arquivo(arquivo):
@@ -164,44 +173,70 @@ class Navegador():
         #import pdb;pdb.set_trace() # <-------------------------------- Debug
         #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
                                         #''
-        #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/button/span').click() #mais 
-        self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/div/span/div/div/div[1]/div[1]/span').click() #mais 
-
-        for num in range(1,15):
-            try:
-                if (arquivo.endswith('.jpg')) or (arquivo.endswith('.gif')) or (arquivo.endswith('.png')) or (arquivo.endswith('.svg')) or (arquivo.endswith('.psd')):
-                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div[1]/span[{num}]/div/ul/div/div/div[2]/li/div/input').send_keys(arquivo)
-                
-                else:                               
-                    self.nav.find_element(By.XPATH, f'//*[@id="app"]/div[1]/span[{num}]/div/ul/div/div/div[1]/li/div/input').send_keys(arquivo)
-                break
-            except:
-                pass
-                #sleep(1)
-            if num >= 14:
-                print("não foi possivel anexar o arquivo")
-                return False
+        #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/button/span').click() #mais            
+        self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Anexar", _element=self.nav.find_element(By.ID, 'main')).click()
+        sleep(1)
         
-        for _ in range(25): 
-            try:
-                self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[3]/div/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div').click()
-                sleep(5)
-                return True
-            except:
-                pass
-            sleep(.25)
+        #self._procurar_element_per_text(By.TAG_NAME, 'title', text="wds-ic-send-filled")
+        
+        
+        
+        if arquivo.endswith(('.jpg', '.gif', '.png', '.svg', '.psd')):
+            self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="image/*,video/mp4,video/3gpp,video/quicktime").send_keys(arquivo)
             
-        # for num in range(15):
-        #     try:                                 
-        #         self.nav.find_element(By.XPATH, f'//*[@id="app"]/div/div[{num}]/div/div[2]/div[2]/span/div/div/div/div[2]/div/div[2]/div[2]/div/div').click()
-        #         return
-        #     except:
-        #         pass
-        #     if num >= 14:
-        #         raise Exception("Erro ao anexar arquivo")
+        elif arquivo.endswith(('.mp3', '.wav', '.ogg', '.aac', '.mpeg', '.flac')):
+            self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="audio/wav,audio/mp3,audio/ogg,audio/aac,audio/mpeg").send_keys(arquivo)
+            
+        else:                               
+            self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="*").send_keys(arquivo)
+        
+        sleep(1)
+        try:
+            self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Enviar").click()
+            sleep(1)
+            return True
+        except:
+            pass        
+
         print("não foi possivel anexar o arquivo")
         return False
         
+    def _procurar_element_per_attribute(self, by:str, value:str, *, attribute:str, value_attribute:str, _element:WebElement|None=None, _type:Literal['equal', 'in']='equal'):
+        if _element is None:
+            element = self.nav
+        else:
+            element = _element
+        
+        for target in element.find_elements(by, value):
+            if _type == 'equal':
+                if value_attribute == str(target.get_attribute(attribute)):
+                    return target
+            elif _type == 'in':
+                if value_attribute in str(target.get_attribute(attribute)):
+                    return target
+            
+            
+            
+            if target.get_attribute(attribute) == value_attribute:
+                return target
+        raise Exception(f"Elemento não encontrado {by}={value} com {attribute}={value_attribute}")
+    
+    def _procurar_element_per_text(self, by:str, value:str, *, text:str, _element:WebElement|None=None, _type:Literal['equal', 'in']='equal'):
+        if _element is None:
+            element = self.nav
+        else:
+            element = _element
+        
+        for target in element.find_elements(by, value):
+            if _type == 'equal':
+                if text == target.text:
+                    return target
+            elif _type == 'in':
+                if text in target.text:
+                    return target    
+            
+        raise Exception(f"Elemento não encontrado {by}={value} com {text=}")
+    
 
     def __verificar_numero(self):
         sleep(2)
@@ -228,13 +263,13 @@ if __name__ == "__main__":
     from datetime import datetime
     bot = Navegador()  
     bot.iniciar_navegador(f"https://web.whatsapp.com/")  
-    
+    #input()
     bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
-    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\Screenshot_1.png")
-    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo='C:\\Users\\renan.oliveira\\Downloads\\log da IA\\Campanha (online-audio-converter.com).mp3')
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo='C:\\Users\\renan.oliveira\\Downloads\\log da IA\\campanhanovolar.png')
 
     print("Concluido")
-    #import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
     #bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
     #bot.enviar_mensagem(numero='9999999999999', mensagem="renan\nteste1\n", arquivo=r"C:\Users\renan.oliveira\Downloads\y\Designer.png")
     
