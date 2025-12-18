@@ -12,6 +12,10 @@ from time import sleep
 from getpass import getuser
 import os
 from typing import Literal
+try:
+    from .utils import *
+except:
+    from utils import enviar_arquivo_abrir
 
 class Nav(Chrome):
     def __delete__(self):
@@ -97,6 +101,7 @@ class Navegador():
     
     
     def enviar_mensagem(self, *, numero:str, mensagem:str, arquivo:str=""):
+        #import pdb;pdb.set_trace() # <-------------------------------- Debug
         try:
             url = f'{self.url}send?phone={numero}'
             #print(url)
@@ -141,10 +146,14 @@ class Navegador():
             #import pdb;pdb.set_trace() # <-------------------------------- Debug
             sleep(1)
 
-            
-            self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Enviar", _element=self.nav.find_element(By.ID, 'main')).click()
+            try:
+                self._procurar_element_per_attribute(By.TAG_NAME, 'button', attribute="aria-label", value_attribute="Enviar", _element=self.nav.find_element(By.ID, 'main')).click()
+            except:
+                try:
+                    self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Enviar", _element=self.nav.find_element(By.ID, 'main')).click()
+                except:
+                    self._procurar_element_per_attribute(By.TAG_NAME, 'span', attribute="aria-label", value_attribute="Enviar", _element=self.nav.find_element(By.ID, 'main')).click()
             sleep(1)
-            
             
                                                                                                                                                           
             if arquivo:
@@ -174,21 +183,35 @@ class Navegador():
         #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[1]/div/button/span').click() #mais 
                                         #''
         #self.nav.find_element(By.XPATH, '//*[@id="main"]/footer/div[1]/div/span/div/div[2]/div/div[1]/button/span').click() #mais            
-        self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Anexar", _element=self.nav.find_element(By.ID, 'main')).click()
+        try:
+            self._procurar_element_per_attribute(By.TAG_NAME, 'button', attribute="aria-label", value_attribute="Anexar", _element=self.nav.find_element(By.ID, 'main')).click()
+        except:
+            self._procurar_element_per_attribute(By.TAG_NAME, 'div', attribute="aria-label", value_attribute="Anexar", _element=self.nav.find_element(By.ID, 'main')).click()
         sleep(1)
         
-        #self._procurar_element_per_text(By.TAG_NAME, 'title', text="wds-ic-send-filled")
-        
-        
+
+
         
         if arquivo.endswith(('.jpg', '.gif', '.png', '.svg', '.psd')):
-            self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="image/*,video/mp4,video/3gpp,video/quicktime").send_keys(arquivo)
+            try:
+                self._procurar_element_per_text(by=By.TAG_NAME, value='span', text='Fotos e vídeos', _type='equal').click()
+                enviar_arquivo_abrir(arquivo)
+            except:
+                self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="image/*,video/mp4,video/3gpp,video/quicktime").send_keys(arquivo)
             
         elif arquivo.endswith(('.mp3', '.wav', '.ogg', '.aac', '.mpeg', '.flac')):
-            self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="audio/wav,audio/mp3,audio/ogg,audio/aac,audio/mpeg").send_keys(arquivo)
+            try:
+                self._procurar_element_per_text(by=By.TAG_NAME, value='span', text='Áudio', _type='equal').click()
+                enviar_arquivo_abrir(arquivo)
+            except:
+                self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="audio/wav,audio/mp3,audio/ogg,audio/aac,audio/mpeg").send_keys(arquivo)
             
-        else:                               
-            self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="*").send_keys(arquivo)
+        else:
+            try:                      
+                self._procurar_element_per_text(by=By.TAG_NAME, value='span', text='Documento', _type='equal').click()
+                enviar_arquivo_abrir(arquivo)
+            except:
+                self._procurar_element_per_attribute(By.TAG_NAME, 'input', attribute="accept", value_attribute="*").send_keys(arquivo)
         
         sleep(1)
         try:
@@ -264,7 +287,9 @@ if __name__ == "__main__":
     bot = Navegador()  
     bot.iniciar_navegador(f"https://web.whatsapp.com/")  
     #input()
-    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\planilha oliveira trust final.xlsx")
+    bot.verificar_tela_inicio()
+    
+    bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo=r"C:\Users\renan.oliveira\OneDrive - PATRIMAR ENGENHARIA S A\Documentos\Screenshot_1.png")
     bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo='C:\\Users\\renan.oliveira\\Downloads\\log da IA\\Campanha (online-audio-converter.com).mp3')
     bot.enviar_mensagem(numero='31994773182', mensagem=datetime.now().strftime("Teste do Renan -> %d/%m/%Y %H:%M:%S.%f"), arquivo='C:\\Users\\renan.oliveira\\Downloads\\log da IA\\campanhanovolar.png')
 
