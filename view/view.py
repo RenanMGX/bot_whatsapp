@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QMainWindow, QGraphicsDropShadowEffect
 from typing import Literal
 from PyQt5.QtCore import Qt
 from model.Entities.navegador import Navegador
@@ -21,41 +21,283 @@ class View(QMainWindow):
         self.__version = version
         super().__init__()
         self.setObjectName("BotWhatsApp")
-        self.resize(200, 100)
+        self.resize(350, 220)
+        
+        # Modern elegant stylesheet with highly visible buttons
+        self.setStyleSheet("""
+            QMainWindow {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #FFFFFF, stop:1 #E8F5E9);
+            }
+            QWidget {
+                background-color: transparent;
+            }
+            QStackedWidget {
+                background-color: transparent;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #00C853, stop:1 #00A544);
+                color: #FFFFFF;
+                border: none;
+                border-radius: 10px;
+                padding: 14px 22px;
+                font-size: 14px;
+                font-weight: bold;
+                font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+                letter-spacing: 0.8px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #00E676, stop:1 #00C853);
+                border: 2px solid #00C853;
+            }
+            QPushButton:pressed {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #00A544, stop:1 #008C3A);
+            }
+            QPushButton:disabled {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #BDBDBD, stop:1 #9E9E9E);
+                color: #EFEFEF;
+            }
+            QListWidget {
+                background-color: #FFFFFF;
+                border: 1px solid #CCCCCC;
+                border-radius: 10px;
+                padding: 10px;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 13px;
+                outline: none;
+            }
+            QListWidget::item {
+                padding: 10px;
+                border-bottom: 1px solid #EEEEEE;
+                border-radius: 5px;
+                margin: 2px 0px;
+                color: #212121;
+                background-color: transparent;
+            }
+            QListWidget::item:hover {
+                background-color: #F5F5F5;
+            }
+            QListWidget::item:selected {
+                background-color: #C8E6C9;
+                color: #1B5E20;
+            }
+            QLabel {
+                color: #212121;
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 12px;
+                background-color: transparent;
+            }
+            QFrame {
+                background-color: #FFFFFF;
+            }
+        """)
         
         self.Telas = QtWidgets.QStackedWidget(self)
-        self.Telas.setGeometry(QtCore.QRect(10, 10, 421, 231))
+        self.Telas.setGeometry(QtCore.QRect(0, 0, 350, 220))
         self.Telas.setObjectName("Telas")
         
+        # ============= TELA 1: INICIAR =============
         self.tela1_iniciar = QtWidgets.QWidget()
         self.tela1_iniciar.setObjectName("tela1_iniciar")
         
-        self.tela1_bt_iniciar = QtWidgets.QPushButton(self.tela1_iniciar)
-        self.tela1_bt_iniciar.setGeometry(QtCore.QRect(50, 25, 91, 31))
+        # Card container for screen 1
+        self.tela1_card = QtWidgets.QFrame(self.tela1_iniciar)
+        self.tela1_card.setGeometry(QtCore.QRect(50, 30, 250, 160))
+        self.tela1_card.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #FFFFFF, stop:1 #FAFAFA);
+                border-radius: 15px;
+                border: 2px solid #E0E0E0;
+            }
+        """)
+        # Add shadow effect to card
+        shadow1 = QGraphicsDropShadowEffect()
+        shadow1.setBlurRadius(30)
+        shadow1.setXOffset(0)
+        shadow1.setYOffset(5)
+        shadow1.setColor(QtGui.QColor(0, 0, 0, 60))
+        self.tela1_card.setGraphicsEffect(shadow1)
+        
+        # Icon/Logo label
+        self.tela1_icon = QtWidgets.QLabel(self.tela1_card)
+        self.tela1_icon.setGeometry(QtCore.QRect(0, 15, 250, 45))
+        self.tela1_icon.setAlignment(QtCore.Qt.AlignCenter)
+        self.tela1_icon.setStyleSheet("""
+            QLabel {
+                font-size: 42px;
+                background-color: transparent;
+            }
+        """)
+        self.tela1_icon.setText("💬")
+        
+        # Title label
+        self.tela1_title = QtWidgets.QLabel(self.tela1_card)
+        self.tela1_title.setGeometry(QtCore.QRect(0, 65, 250, 30))
+        self.tela1_title.setAlignment(QtCore.Qt.AlignCenter)
+        self.tela1_title.setStyleSheet("""
+            QLabel {
+                font-size: 17px;
+                font-weight: bold;
+                color: #00A544;
+                background-color: transparent;
+            }
+        """)
+        self.tela1_title.setText("Bot WhatsApp")
+        
+        # Start button
+        self.tela1_bt_iniciar = QtWidgets.QPushButton(self.tela1_card)
+        self.tela1_bt_iniciar.setGeometry(QtCore.QRect(60, 105, 130, 42))
         self.tela1_bt_iniciar.setObjectName("tela1_bt_iniciar")
+        self.tela1_bt_iniciar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.tela1_bt_iniciar.setStyleSheet("""
+            QPushButton {
+                font-size: 14px;
+                min-height: 42px;
+            }
+        """)
         
         self.Telas.addWidget(self.tela1_iniciar)
         
+        # ============= TELA 2: DADOS =============
         self.tela2_dados = QtWidgets.QWidget()
         self.tela2_dados.setObjectName("tela2_dados")
         
-        self.tela2_bt_carregar_arquivo = QtWidgets.QPushButton(self.tela2_dados)
-        self.tela2_bt_carregar_arquivo.setGeometry(QtCore.QRect(10, 10, 111, 41))
+        # Header with title
+        self.tela2_header = QtWidgets.QLabel(self.tela2_dados)
+        self.tela2_header.setGeometry(QtCore.QRect(25, 15, 570, 40))
+        self.tela2_header.setStyleSheet("""
+            QLabel {
+                color: #00A544;
+                font-size: 26px;
+                font-weight: bold;
+                background-color: transparent;
+            }
+        """)
+        self.tela2_header.setText("💬 Automação WhatsApp")
+        
+        self.tela2_subtitle = QtWidgets.QLabel(self.tela2_dados)
+        self.tela2_subtitle.setGeometry(QtCore.QRect(25, 50, 570, 25))
+        self.tela2_subtitle.setStyleSheet("""
+            QLabel {
+                color: #616161;
+                font-size: 13px;
+                background-color: transparent;
+            }
+        """)
+        self.tela2_subtitle.setText("Carregue seus arquivos e envie mensagens automaticamente")
+        
+        # Left panel card for controls
+        self.tela2_control_card = QtWidgets.QFrame(self.tela2_dados)
+        self.tela2_control_card.setGeometry(QtCore.QRect(25, 85, 175, 285))
+        self.tela2_control_card.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #FFFFFF, stop:1 #F8F9FA);
+                border-radius: 15px;
+                border: 2px solid #E0E0E0;
+            }
+        """)
+        shadow2 = QGraphicsDropShadowEffect()
+        shadow2.setBlurRadius(25)
+        shadow2.setXOffset(0)
+        shadow2.setYOffset(4)
+        shadow2.setColor(QtGui.QColor(0, 0, 0, 50))
+        self.tela2_control_card.setGraphicsEffect(shadow2)
+        
+        # Control panel title
+        self.tela2_control_title = QtWidgets.QLabel(self.tela2_control_card)
+        self.tela2_control_title.setGeometry(QtCore.QRect(0, 15, 175, 35))
+        self.tela2_control_title.setAlignment(QtCore.Qt.AlignCenter)
+        self.tela2_control_title.setStyleSheet("""
+            QLabel {
+                color: #00A544;
+                font-size: 15px;
+                font-weight: bold;
+                background-color: transparent;
+            }
+        """)
+        self.tela2_control_title.setText("📋 Controles")
+        
+        # Load files button
+        self.tela2_bt_carregar_arquivo = QtWidgets.QPushButton(self.tela2_control_card)
+        self.tela2_bt_carregar_arquivo.setGeometry(QtCore.QRect(22, 60, 130, 48))
         self.tela2_bt_carregar_arquivo.setObjectName("tela2_bt_carregar_arquivo")
+        self.tela2_bt_carregar_arquivo.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.tela2_bt_carregar_arquivo.setStyleSheet("""
+            QPushButton {
+                font-size: 12px;
+            }
+        """)
         
-        self.tela2_bt_enviar = QtWidgets.QPushButton(self.tela2_dados)
+        # Send button
+        self.tela2_bt_enviar = QtWidgets.QPushButton(self.tela2_control_card)
         self.tela2_bt_enviar.setEnabled(False)
-        self.tela2_bt_enviar.setGeometry(QtCore.QRect(10, 60, 111, 41))
+        self.tela2_bt_enviar.setGeometry(QtCore.QRect(22, 120, 130, 48))
         self.tela2_bt_enviar.setObjectName("tela2_bt_carregar_arquivo_2")
+        self.tela2_bt_enviar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.tela2_bt_enviar.setStyleSheet("""
+            QPushButton {
+                font-size: 12px;
+            }
+        """)
         
-        self.tela2_lista = QtWidgets.QListWidget(self.tela2_dados)
-        self.tela2_lista.setGeometry(QtCore.QRect(140, 10, 256, 192))
-        self.tela2_lista.setObjectName("tela2_lista")
-        
-        self.tela2_label = QtWidgets.QLabel(self.tela2_dados)
-        self.tela2_label.setGeometry(QtCore.QRect(10, 120, 111, 80))
-        #self.tela2_label.setStyleSheet("border: 2px solid black")
+        # Status label
+        self.tela2_label = QtWidgets.QLabel(self.tela2_control_card)
+        self.tela2_label.setGeometry(QtCore.QRect(12, 185, 150, 85))
+        self.tela2_label.setStyleSheet("""
+            QLabel {
+                background-color: #FFF8E1;
+                border: 2px solid #FFD54F;
+                border-radius: 10px;
+                padding: 12px;
+                color: #424242;
+                font-size: 11px;
+            }
+        """)
         self.tela2_label.setWordWrap(True)
+        self.tela2_label.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
+        
+        # Right panel card for list
+        self.tela2_list_card = QtWidgets.QFrame(self.tela2_dados)
+        self.tela2_list_card.setGeometry(QtCore.QRect(210, 85, 370, 285))
+        self.tela2_list_card.setStyleSheet("""
+            QFrame {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #FFFFFF, stop:1 #F8F9FA);
+                border-radius: 15px;
+                border: 2px solid #E0E0E0;
+            }
+        """)
+        shadow3 = QGraphicsDropShadowEffect()
+        shadow3.setBlurRadius(25)
+        shadow3.setXOffset(0)
+        shadow3.setYOffset(4)
+        shadow3.setColor(QtGui.QColor(0, 0, 0, 50))
+        self.tela2_list_card.setGraphicsEffect(shadow3)
+        
+        # List title
+        self.tela2_list_title = QtWidgets.QLabel(self.tela2_list_card)
+        self.tela2_list_title.setGeometry(QtCore.QRect(0, 15, 370, 35))
+        self.tela2_list_title.setAlignment(QtCore.Qt.AlignCenter)
+        self.tela2_list_title.setStyleSheet("""
+            QLabel {
+                color: #00A544;
+                font-size: 15px;
+                font-weight: bold;
+                background-color: transparent;
+            }
+        """)
+        self.tela2_list_title.setText("📊 Lista de Envios")
+        
+        # List widget
+        self.tela2_lista = QtWidgets.QListWidget(self.tela2_list_card)
+        self.tela2_lista.setGeometry(QtCore.QRect(15, 55, 340, 215))
+        self.tela2_lista.setObjectName("tela2_lista")
         
         self.Telas.addWidget(self.tela2_dados)
 
@@ -67,11 +309,11 @@ class View(QMainWindow):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("BotWhatsApp", f"Automação WhatsAPP {self.__version}"))
         
-        self.tela1_bt_iniciar.setText(_translate("BotWhatsApp", "Iniciar"))
+        self.tela1_bt_iniciar.setText(_translate("BotWhatsApp", "INICIAR"))
         
-        self.tela2_bt_carregar_arquivo.setText(_translate("BotWhatsApp", "Carregar Arquivos"))
+        self.tela2_bt_carregar_arquivo.setText(_translate("BotWhatsApp", "📁 Carregar"))
         
-        self.tela2_bt_enviar.setText(_translate("BotWhatsApp", "Enviar"))
+        self.tela2_bt_enviar.setText(_translate("BotWhatsApp", "✉ Enviar"))
         
         __sortingEnabled = self.tela2_lista.isSortingEnabled()
         
@@ -81,9 +323,15 @@ class View(QMainWindow):
         
     def paginate(self, index:int):
         if index == 0:
-            self.resize(200, 100)
+            self.resize(350, 220)
+            self.setMinimumSize(350, 220)
+            self.setMaximumSize(350, 220)
+            self.Telas.setGeometry(QtCore.QRect(0, 0, 350, 220))
         elif index == 1:
-            self.resize(450, 250)
+            self.resize(605, 390)
+            self.setMinimumSize(605, 390)
+            self.setMaximumSize(605, 390)
+            self.Telas.setGeometry(QtCore.QRect(0, 0, 605, 390))
         self.Telas.setCurrentIndex(index)
         
     def adicionar_item(self, *, text:str, type:Literal['Unchecked', 'Checked']):
@@ -92,11 +340,20 @@ class View(QMainWindow):
 
         if type =='Checked':
             item.setCheckState(QtCore.Qt.Checked) #type:ignore
+            font = item.font()
+            font.setPointSize(10)
+            font.setBold(True)
+            item.setFont(font)
+            item.setForeground(QtGui.QColor('#1B5E20'))
+            item.setText(f"✅  {text}")
         elif type == 'Unchecked':
             item.setCheckState(QtCore.Qt.Unchecked) #type:ignore
+            font = item.font()
+            font.setPointSize(10)
+            item.setFont(font)
+            item.setForeground(QtGui.QColor('#757575'))
+            item.setText(f"⏳  {text}")
             
-        item.setText(text)
-        
         self.tela2_lista.addItem(item)
 
     def closeEvent(self, event):

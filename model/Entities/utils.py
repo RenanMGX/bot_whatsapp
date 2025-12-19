@@ -11,7 +11,7 @@ def enviar_arquivo_abrir(arquivo):
     for i in range(10):
         try:
             
-            #import pdb;pdb.set_trace() # <-------------------------------- Debug
+            import pdb;pdb.set_trace() # <-------------------------------- Debug
             app = Application().connect(title_re=f".*Abrir.*")
             
             n_caract = {'~':'', '%':'', '¨':'', '(':'', ')':'', '=':''}
@@ -32,6 +32,7 @@ def enviar_arquivo_abrir(arquivo):
                 
             janela["&Nome:Edit"].set_edit_text(arquivo)
             janela["&Abrir"].click()
+            
             
             sleep(1)
             os.remove(arquivo) if temp_name != os.path.basename(arquivo) else None
